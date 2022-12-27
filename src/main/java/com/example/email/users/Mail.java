@@ -5,12 +5,18 @@ public class Mail {
     private String receiver;
     private String subject;
     private String body;
+    private Long id;
+    private boolean important;
+    private boolean read;
 
-    public Mail(String sender, String receiver, String subject, String body) {
+    public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read) {
         this.sender = sender;
         this.receiver = receiver;
         this.subject = subject;
         this.body = body;
+        this.id = id;
+        this.important = important;
+        this.read = read;
     }
 
     public String getSender() {
@@ -52,6 +58,9 @@ public class Mail {
                 ", \"receiver\": " + "\"" + receiver + "\"" +
                 ", \"subject\": " + "\"" + subject + "\"" +
                 ", \"body\": " +"\"" + body + "\"" +
+                ", \"id\": " + id +
+                ", \"important\": " + important +
+                ", \"read\": " + read +
                 '}';
     }
 }

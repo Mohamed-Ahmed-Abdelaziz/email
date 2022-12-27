@@ -25,7 +25,9 @@ public class UsersService {
     private JSONObject account;
     private String accountBody = "{\n" +
             "\"inbox\": [],\n" +
-            "\"sent\": []\n" +
+            "\"sent\": [],\n" +
+            "\"draft\": [],\n" +
+            "\"trash\": []\n" +
             "}";
 
     public UsersService() throws IOException, ParseException {
@@ -121,4 +123,42 @@ public class UsersService {
         mails = (JSONArray) account.get("sent");
         return mails;
     }
+
+    public void draftingMail(String userEmail, Mail mail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("draft");
+        mails.add(mail);
+        account.put("draft", mails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deletingMail(String userEmail, Long id) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        JSONArray trashMails = (JSONArray) account.get("trash");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if (jsonMail.get("id") == id){
+                trashMails.add(mails.get(i));
+                mails.remove(i);
+            }
+        }
+        account.put("inbox", mails);
+        account.put("trash", trashMails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -39,6 +39,14 @@ public class UsersController {
     public JSONArray getSent(@PathVariable String userEmail) throws IOException, ParseException {
         return usersService.getSent(userEmail);
     }
+    @PostMapping("draftingmail/{userEmail}")
+    public void draftingMail(@PathVariable String userEmail, @RequestBody Mail mail) throws IOException, ParseException {
+        usersService.draftingMail(userEmail, mail);
+    }
+    @GetMapping("deletingmail/{userEmail}/{id}")
+    public void deletingMail(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
+        usersService.deletingMail(userEmail, id);
+    }
 //    @GetMapping
 //    public boolean test(){
 //        usersService.signUp();
