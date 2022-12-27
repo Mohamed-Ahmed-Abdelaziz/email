@@ -55,6 +55,10 @@ public class UsersController {
     public void makingUnImportant(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
         usersService.makingUnImportant(userEmail, id);
     }
+    @GetMapping("makingread/{userEmail}/{id}")
+    public void makingRead(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
+        usersService.makingRead(userEmail, id);
+    }
 //    @GetMapping
 //    public boolean test(){
 //        usersService.signUp();
