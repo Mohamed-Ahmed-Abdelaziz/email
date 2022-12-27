@@ -161,4 +161,49 @@ public class UsersService {
         }
     }
 
+    public void makingImportant(String userEmail, Long id) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if (jsonMail.get("id") == id){
+                jsonMail.put("important", true);
+                mails.remove(i);
+                mails.add(jsonMail);
+                break;
+            }
+        }
+        account.put("inbox", mails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void makingUnImportant(String userEmail, Long id) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if (jsonMail.get("id") == id){
+                jsonMail.put("important", false);
+                mails.remove(i);
+                mails.add(jsonMail);
+                break;
+            }
+        }
+        account.put("inbox", mails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

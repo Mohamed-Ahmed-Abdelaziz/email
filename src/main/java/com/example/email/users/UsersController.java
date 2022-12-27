@@ -47,6 +47,14 @@ public class UsersController {
     public void deletingMail(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
         usersService.deletingMail(userEmail, id);
     }
+    @GetMapping("makingimportant/{userEmail}/{id}")
+    public void makingImportant(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
+        usersService.makingImportant(userEmail, id);
+    }
+    @GetMapping("makingunimportant/{userEmail}/{id}")
+    public void makingUnImportant(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
+        usersService.makingUnImportant(userEmail, id);
+    }
 //    @GetMapping
 //    public boolean test(){
 //        usersService.signUp();
