@@ -22,12 +22,14 @@ public class UsersService {
     private String filename;
     private JSONArray users;
     private JSONArray mails;
+    private JSONArray contacts;
     private JSONObject account;
     private String accountBody = "{\n" +
             "\"inbox\": [],\n" +
             "\"sent\": [],\n" +
             "\"draft\": [],\n" +
-            "\"trash\": []\n" +
+            "\"trash\": [],\n" +
+            "\"contacts\": []\n" +
             "}";
 
     public UsersService() throws IOException, ParseException {
@@ -319,4 +321,62 @@ public class UsersService {
         }
         return foundedMails;
     }
+
+    public JSONArray getcontacts(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        contacts = (JSONArray) account.get("contacts");
+        return contacts;
+    }
+
+    public boolean addContact(String userEmail, String contactEmail) throws IOException, ParseException {
+        filename = "users.json";
+        Object objc = new JSONParser().parse(new FileReader(this.filename));
+        users = (JSONArray) objc;
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc2 = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc2;
+        contacts = (JSONArray) account.get("contacts");
+        boolean flage = false;
+        for(int i = 0; i < users.size(); ++i){
+            Object user = users.get(i);
+            JSONObject jsonUser = (JSONObject) user;
+            if(jsonUser.get("userEmail").equals(contactEmail)){
+                jsonUser.remove("userPassword");
+                contacts.add(jsonUser);
+                flage = true;
+                break;
+            }
+        }
+        account.put("contacts", contacts);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return flage;
+    }
+
+    public void deleteContact(String userEmail, String contactEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        contacts = (JSONArray) account.get("contacts");
+        for(int i = 0; i < contacts.size(); ++i){
+            Object user = contacts.get(i);
+            JSONObject jsonContact = (JSONObject) user;
+            if(jsonContact.get("userEmail").equals(contactEmail)){
+                contacts.remove(i);
+                break;
+            }
+        }
+        account.put("contacts", contacts);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

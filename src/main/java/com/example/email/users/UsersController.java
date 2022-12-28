@@ -63,7 +63,7 @@ public class UsersController {
     public void draftingMail(@PathVariable String userEmail, @RequestBody Mail mail) throws IOException, ParseException {
         usersService.draftingMail(userEmail, mail);
     }
-    @GetMapping("deletingmail/{userEmail}/{id}")
+    @DeleteMapping("deletingmail/{userEmail}/{id}")
     public void deletingMail(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
         usersService.deletingMail(userEmail, id);
     }
@@ -83,9 +83,17 @@ public class UsersController {
     public JSONArray search(@PathVariable String userEmail, @PathVariable String searchKey) throws IOException, ParseException {
         return usersService.search(userEmail, searchKey);
     }
-//    @GetMapping
-//    public boolean test(){
-//        usersService.signUp();
-//        return true;
-//    }
+    @GetMapping("contacts/{userEmail}")
+    public JSONArray getcontacts(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getcontacts(userEmail);
+    }
+    @PostMapping("addcontact/{userEmail}/{contactEmail}")
+    public boolean addContact(@PathVariable String userEmail, @PathVariable String contactEmail) throws IOException, ParseException {
+        return usersService.addContact(userEmail, contactEmail);
+    }
+    @DeleteMapping("deletecontact/{userEmail}/{contactEmail}")
+    public void deleteContact(@PathVariable String userEmail, @PathVariable String contactEmail) throws IOException, ParseException {
+        usersService.deleteContact(userEmail, contactEmail);
+    }
+
 }
