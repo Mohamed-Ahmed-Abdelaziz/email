@@ -289,4 +289,34 @@ public class UsersService {
             e.printStackTrace();
         }
     }
+
+    public JSONArray search(String userEmail, String searchKey) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        JSONArray foundedMails = new JSONArray();
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            String body = (String) jsonMail.get("body");
+            String sender = (String) jsonMail.get("sender");
+            String receiver = (String) jsonMail.get("receiver");
+            String subject = (String) jsonMail.get("subject");
+            if (body.contains(searchKey)){
+                foundedMails.add(jsonMail);
+                continue;
+            }else if(subject.contains(searchKey)){
+                foundedMails.add(jsonMail);
+                continue;
+            }else if(sender.contains(searchKey)){
+                foundedMails.add(jsonMail);
+                continue;
+            }else if(receiver.contains(searchKey)){
+                foundedMails.add(jsonMail);
+                continue;
+            }
+        }
+        return foundedMails;
+    }
 }

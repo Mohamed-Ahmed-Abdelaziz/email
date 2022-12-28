@@ -79,6 +79,10 @@ public class UsersController {
     public void makingRead(@PathVariable String userEmail, @PathVariable Long id) throws IOException, ParseException {
         usersService.makingRead(userEmail, id);
     }
+    @GetMapping("search/{userEmail}/{searchKey}")
+    public JSONArray search(@PathVariable String userEmail, @PathVariable String searchKey) throws IOException, ParseException {
+        return usersService.search(userEmail, searchKey);
+    }
 //    @GetMapping
 //    public boolean test(){
 //        usersService.signUp();
