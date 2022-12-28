@@ -89,6 +89,12 @@ public class UsersService {
             mails = (JSONArray) account.get("sent");
             mails.add(mail);
             account.put("sent", mails);
+            // checking Emails so that it can be added to contacts
+//            if(!containContact(senderEmail, mail.getReceiver())){
+//                contacts = (JSONArray) account.get("contacts");
+//                addContact(senderEmail, mail.getReceiver());
+//                account.put("contacts", contacts);
+//            }
             try {
                 Files.write(Paths.get(filename), account.toJSONString().getBytes());
             } catch (IOException e) {
@@ -101,10 +107,43 @@ public class UsersService {
             mails = (JSONArray) account.get("inbox");
             mails.add(mail);
             account.put("inbox", mails);
+            // checking Emails so that it can be added to contacts
+//            if(!containContact(mail.getReceiver(), senderEmail)){
+//                contacts = (JSONArray) account.get("contacts");
+//                addContact(mail.getReceiver(), senderEmail);
+//                account.put("contacts", contacts);
+//            }
             try {
                 Files.write(Paths.get(filename), account.toJSONString().getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            // checking Emails so that it can be added to contacts
+            if(!containContact(senderEmail, mail.getReceiver())){
+                filename = "accounts/" + senderEmail + "/" + senderEmail + ".json";
+                objc = new JSONParser().parse(new FileReader(filename));
+                account = (JSONObject) objc;
+                contacts = (JSONArray) account.get("contacts");
+                addContact(senderEmail, mail.getReceiver());
+                account.put("contacts", contacts);
+                try {
+                    Files.write(Paths.get(filename), account.toJSONString().getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(!containContact(mail.getReceiver(), senderEmail)){
+                filename = "accounts/" + mail.getReceiver() + "/" + mail.getReceiver() + ".json";
+                objc = new JSONParser().parse(new FileReader(filename));
+                account = (JSONObject) objc;
+                contacts = (JSONArray) account.get("contacts");
+                addContact(mail.getReceiver(), senderEmail);
+                account.put("contacts", contacts);
+                try {
+                    Files.write(Paths.get(filename), account.toJSONString().getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return flag;
@@ -378,5 +417,18 @@ public class UsersService {
             e.printStackTrace();
         }
     }
-
+    public boolean containContact(String userEmail, String contactEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        contacts = (JSONArray) account.get("contacts");
+        for(int i = 0; i < contacts.size(); ++i){
+            Object user = contacts.get(i);
+            JSONObject jsonContact = (JSONObject) user;
+            if(jsonContact.get("userEmail").equals(contactEmail)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
