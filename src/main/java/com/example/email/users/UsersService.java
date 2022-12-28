@@ -124,6 +124,66 @@ public class UsersService {
         return mails;
     }
 
+    public JSONArray getDraft(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("draft");
+        return mails;
+    }
+    public JSONArray getTrash(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("Trash");
+        return mails;
+    }
+    public JSONArray getImportant(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        JSONArray importantMails = new JSONArray();
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if ((boolean) jsonMail.get("important")){
+                importantMails.add(jsonMail);
+            }
+        }
+        return importantMails;
+    }
+    public JSONArray getRead(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        JSONArray readMails = new JSONArray();
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if ((boolean) jsonMail.get("read")){
+                readMails.add(jsonMail);
+            }
+        }
+        return readMails;
+    }
+    public JSONArray getunRead(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        JSONArray unreadMails = new JSONArray();
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if (!(boolean) jsonMail.get("read")){
+                unreadMails.add(jsonMail);
+            }
+        }
+        return unreadMails;
+    }
+
     public void draftingMail(String userEmail, Mail mail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));

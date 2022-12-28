@@ -39,6 +39,26 @@ public class UsersController {
     public JSONArray getSent(@PathVariable String userEmail) throws IOException, ParseException {
         return usersService.getSent(userEmail);
     }
+    @GetMapping("draft/{userEmail}")
+    public JSONArray getDraft(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getDraft(userEmail);
+    }
+    @GetMapping("trash/{userEmail}")
+    public JSONArray getTrash(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getTrash(userEmail);
+    }
+    @GetMapping("important/{userEmail}")
+    public JSONArray getImportant(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getImportant(userEmail);
+    }
+    @GetMapping("read/{userEmail}")
+    public JSONArray getRead(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getRead(userEmail);
+    }
+    @GetMapping("unread/{userEmail}")
+    public JSONArray getunRead(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.getunRead(userEmail);
+    }
     @PostMapping("draftingmail/{userEmail}")
     public void draftingMail(@PathVariable String userEmail, @RequestBody Mail mail) throws IOException, ParseException {
         usersService.draftingMail(userEmail, mail);
