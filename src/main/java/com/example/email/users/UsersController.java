@@ -4,6 +4,10 @@ package com.example.email.users;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -112,6 +116,10 @@ public class UsersController {
             , @PathVariable String receiverEmail
             , @PathVariable long id) throws IOException {
         usersService.uploadAttachments(multipartFiles, senderEmail, receiverEmail, id);
+    }
+    @GetMapping("downloadattachment/{userEmail}/{id}")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable String userEmail, @PathVariable("id") long id) throws IOException {
+        return usersService.downloadAttachment(userEmail, id);
     }
 
 }
