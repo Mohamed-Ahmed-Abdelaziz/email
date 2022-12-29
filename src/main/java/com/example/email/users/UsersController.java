@@ -4,10 +4,19 @@ package com.example.email.users;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -94,6 +103,15 @@ public class UsersController {
     @DeleteMapping("deletecontact/{userEmail}/{contactEmail}")
     public void deleteContact(@PathVariable String userEmail, @PathVariable String contactEmail) throws IOException, ParseException {
         usersService.deleteContact(userEmail, contactEmail);
+    }
+    //----------------------
+    // attachment manipulation
+    @PostMapping("/uploadattachment/{senderEmail}/{receiverEmail}/{id}")
+    public void uploadAttachments(@RequestParam("files")List<MultipartFile> multipartFiles
+            , @PathVariable String senderEmail
+            , @PathVariable String receiverEmail
+            , @PathVariable long id) throws IOException {
+        usersService.uploadAttachments(multipartFiles, senderEmail, receiverEmail, id);
     }
 
 }

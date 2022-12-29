@@ -9,13 +9,19 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UsersService {
@@ -431,4 +437,23 @@ public class UsersService {
         }
         return false;
     }
+    // ---------------------
+    // attachments manipulation
+    public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException {
+        String senderDirectory = "accounts/" + senderEmail + "/";
+        String receiverDirectory = "accounts/" + receiverEmail + "/";
+        List<String> filenames = new ArrayList<>();
+        for(MultipartFile file : multipartFiles) {
+            String filename = StringUtils.cleanPath(file.getOriginalFilename());
+            filename = Long.toString(id) + "_" + filename;
+
+            Path fileStorage = Paths.get(senderDirectory, filename).toAbsolutePath().normalize();
+            Files.copy(file.getInputStream(), fileStorage, StandardCopyOption.REPLACE_EXISTING);
+
+            fileStorage = Paths.get(receiverDirectory, filename).toAbsolutePath().normalize();
+            Files.copy(file.getInputStream(), fileStorage, StandardCopyOption.REPLACE_EXISTING);
+            filenames.add(filename);
+        }
+    }
+
 }
