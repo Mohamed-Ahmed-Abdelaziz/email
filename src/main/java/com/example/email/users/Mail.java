@@ -8,8 +8,20 @@ public class Mail {
     private Long id;
     private boolean important;
     private boolean read;
+    private String date;
 
-    public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read) {
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    private int importance;
+
+    public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read, int importance) {
         this.sender = sender;
         this.receiver = receiver;
         this.subject = subject;
@@ -17,8 +29,16 @@ public class Mail {
         this.id = id;
         this.important = important;
         this.read = read;
+        this.importance = importance;
     }
 
+    public int getImportance() {
+        return importance;
+    }
+
+    public void setImportance(int importance) {
+        this.importance = importance;
+    }
     public String getSender() {
         return sender;
     }
@@ -61,6 +81,8 @@ public class Mail {
                 ", \"id\": " + id +
                 ", \"important\": " + important +
                 ", \"read\": " + read +
+                ", \"importance\": " + importance +
+                ", \"date\": " +"\"" + date + "\"" +
                 '}';
     }
 }

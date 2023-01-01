@@ -42,6 +42,7 @@ public class UsersController {
     }
     @PostMapping("sendingmail/{senderEmail}")
     public boolean sendingMail(@PathVariable String senderEmail, @RequestBody Mail mail) throws IOException, ParseException {
+        System.out.println(mail);
         return usersService.sendingMail(senderEmail, mail);
     }
     @GetMapping("inbox/{userEmail}")
@@ -95,6 +96,10 @@ public class UsersController {
     @GetMapping("search/{userEmail}/{searchKey}")
     public JSONArray search(@PathVariable String userEmail, @PathVariable String searchKey) throws IOException, ParseException {
         return usersService.search(userEmail, searchKey);
+    }
+    @GetMapping("sortinbox/{userEmail}")
+    public JSONArray sortInbox(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.sortInbox(userEmail);
     }
     @GetMapping("contacts/{userEmail}")
     public JSONArray getcontacts(@PathVariable String userEmail) throws IOException, ParseException {

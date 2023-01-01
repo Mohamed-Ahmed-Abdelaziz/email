@@ -1,9 +1,7 @@
 package com.example.email.users;
 
 
-//import org.apache.tomcat.util.json.JSONParser;
-//import org.json.JSONArray;
-
+import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,13 +15,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -43,6 +46,8 @@ public class UsersService implements IUsersService {
             "\"trash\": [],\n" +
             "\"contacts\": []\n" +
             "}";
+    String datePattern = "dd/MM/yyyy HH:mm:ss ";
+    DateTimeFormatter df = DateTimeFormatter.ofPattern(datePattern);
 
     private UsersService() {
     }
@@ -72,6 +77,10 @@ public class UsersService implements IUsersService {
             JSONObject jsonUser = (JSONObject) userData;
             if (jsonUser.get("userEmail").equals(mail.getReceiver())) flag = true;
         }
+
+        LocalDateTime now = LocalDateTime.now();
+        String dateNow = df.format(now);
+        mail.setDate(dateNow);
         if(flag == true) {
             filename = "accounts/" + senderEmail + "/" + senderEmail + ".json";
             objc = new JSONParser().parse(new FileReader(filename));
@@ -161,6 +170,16 @@ public class UsersService implements IUsersService {
         Object objc = new JSONParser().parse(new FileReader(filename));
         account = (JSONObject) objc;
         mails = (JSONArray) account.get("Trash");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            String date = jsonMail.get("date").toString();
+            LocalDateTime dateParsed = LocalDateTime.parse(date, df);
+            if(dateParsed.getDayOfMonth() - LocalDateTime.now().getDayOfMonth() < -29){
+                mails.remove(i);
+            }
+        }
+        account.put("trash", mails);
         return mails;
     }
     @Override
@@ -352,6 +371,25 @@ public class UsersService implements IUsersService {
             }
         }
         return foundedMails;
+    }
+    public JSONArray sortInbox(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        mails.sort(new Comparator() {
+            @Override
+            public int compare(Object mail1, Object mail2) {
+                JSONObject jsonMail1 = (JSONObject) mail1;
+                JSONObject jsonMail2 = (JSONObject) mail2;
+                String date1 = (String) jsonMail1.get("date");
+                String date2 = (String) jsonMail2.get("date");
+                LocalDateTime date1Parsed = LocalDateTime.parse(date1, df);
+                LocalDateTime date2Parsed = LocalDateTime.parse(date2, df);
+                return date2Parsed.compareTo(date1Parsed);
+            }
+        });
+        return mails;
     }
 
     @Override
