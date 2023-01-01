@@ -27,14 +27,14 @@ import java.util.List;
 public class UsersController {
     private final UsersService usersService;
 
-    @Autowired
-    public UsersController(UsersService usersService) {
-        this.usersService = usersService;
+
+    public UsersController() {
+        this.usersService = UsersService.getInstance();
     }
 
     @PostMapping("signup")
-    public void signUp(@RequestBody User user) throws IOException, ParseException {
-        usersService.signUp(user);
+    public boolean signUp(@RequestBody User user) throws IOException, ParseException {
+        return usersService.signUp(user);
     }
     @PostMapping("login")
     public boolean logIn(@RequestBody User user) throws IOException, ParseException {

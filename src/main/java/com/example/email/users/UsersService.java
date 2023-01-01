@@ -13,15 +13,12 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,8 +26,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class UsersService {
+
+public class UsersService implements IUsersService {
+    private static UsersService instance = new UsersService();
+    private AttachmentsManipulation attachmentsManipulation = new AttachmentsManipulation();
+    private ConcreteAccountsManipulator accountsManipulator = new ConcreteAccountsManipulator();
     private String filename;
     private JSONArray users;
     private JSONArray mails;
@@ -44,45 +44,23 @@ public class UsersService {
             "\"contacts\": []\n" +
             "}";
 
-    public UsersService() throws IOException, ParseException {
-
+    private UsersService() {
+    }
+    public static UsersService getInstance(){
+        return instance;
     }
 
-    public void signUp(User user) throws IOException, ParseException {
-        filename = "users.json";
-        Object objc = new JSONParser().parse(new FileReader(this.filename));
-        users = (JSONArray) objc;
-
-        users.add(user);
-        try {
-            Files.write(Paths.get(this.filename), users.toJSONString().getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        new File("accounts/" + user.getUserEmail()).mkdirs();
-        String path = "accounts/" + user.getUserEmail() + "/" + user.getUserEmail() + ".json";
-        File file = new File(path);
-        file.createNewFile();
-        Files.write(Paths.get(path), accountBody.getBytes());
+    @Override
+    public boolean signUp(User user) throws IOException, ParseException {
+        return accountsManipulator.signUp(user);
     }
 
+    @Override
     public boolean logIn(User user) throws IOException, ParseException {
-        filename = "users.json";
-        Object objc = new JSONParser().parse(new FileReader(this.filename));
-        users = (JSONArray) objc;
-
-        for(int i = 0; i < users.size(); i++){
-            Object userData = users.get(i);
-            JSONObject jsonUser = (JSONObject) userData;
-            if (jsonUser.get("userName").equals(user.getUserName())
-                && jsonUser.get("userEmail").equals(user.getUserEmail())
-                && jsonUser.get("userPassword").equals(user.getUserPassword())
-            )
-                return true;
-        }
-        return false;
+        return accountsManipulator.logIn(user);
     }
 
+    @Override
     public boolean sendingMail(String senderEmail, Mail mail) throws IOException, ParseException {
         filename = "users.json";
         Object objc = new JSONParser().parse(new FileReader(this.filename));
@@ -101,12 +79,7 @@ public class UsersService {
             mails = (JSONArray) account.get("sent");
             mails.add(mail);
             account.put("sent", mails);
-            // checking Emails so that it can be added to contacts
-//            if(!containContact(senderEmail, mail.getReceiver())){
-//                contacts = (JSONArray) account.get("contacts");
-//                addContact(senderEmail, mail.getReceiver());
-//                account.put("contacts", contacts);
-//            }
+
             try {
                 Files.write(Paths.get(filename), account.toJSONString().getBytes());
             } catch (IOException e) {
@@ -119,12 +92,7 @@ public class UsersService {
             mails = (JSONArray) account.get("inbox");
             mails.add(mail);
             account.put("inbox", mails);
-            // checking Emails so that it can be added to contacts
-//            if(!containContact(mail.getReceiver(), senderEmail)){
-//                contacts = (JSONArray) account.get("contacts");
-//                addContact(mail.getReceiver(), senderEmail);
-//                account.put("contacts", contacts);
-//            }
+
             try {
                 Files.write(Paths.get(filename), account.toJSONString().getBytes());
             } catch (IOException e) {
@@ -161,6 +129,7 @@ public class UsersService {
         return flag;
     }
 
+    @Override
     public JSONArray getInbox(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -169,6 +138,7 @@ public class UsersService {
         return mails;
     }
 
+    @Override
     public JSONArray getSent(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -177,6 +147,7 @@ public class UsersService {
         return mails;
     }
 
+    @Override
     public JSONArray getDraft(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -184,6 +155,7 @@ public class UsersService {
         mails = (JSONArray) account.get("draft");
         return mails;
     }
+    @Override
     public JSONArray getTrash(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -191,6 +163,7 @@ public class UsersService {
         mails = (JSONArray) account.get("Trash");
         return mails;
     }
+    @Override
     public JSONArray getImportant(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -206,6 +179,7 @@ public class UsersService {
         }
         return importantMails;
     }
+    @Override
     public JSONArray getRead(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -221,6 +195,7 @@ public class UsersService {
         }
         return readMails;
     }
+    @Override
     public JSONArray getunRead(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -237,6 +212,7 @@ public class UsersService {
         return unreadMails;
     }
 
+    @Override
     public void draftingMail(String userEmail, Mail mail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -251,6 +227,7 @@ public class UsersService {
         }
     }
 
+    @Override
     public void deletingMail(String userEmail, Long id) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -274,6 +251,7 @@ public class UsersService {
         }
     }
 
+    @Override
     public void makingImportant(String userEmail, Long id) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -297,6 +275,7 @@ public class UsersService {
         }
     }
 
+    @Override
     public void makingUnImportant(String userEmail, Long id) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -320,6 +299,7 @@ public class UsersService {
         }
     }
 
+    @Override
     public void makingRead(String userEmail, Long id) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -343,6 +323,7 @@ public class UsersService {
         }
     }
 
+    @Override
     public JSONArray search(String userEmail, String searchKey) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -373,6 +354,7 @@ public class UsersService {
         return foundedMails;
     }
 
+    @Override
     public JSONArray getcontacts(String userEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -381,6 +363,7 @@ public class UsersService {
         return contacts;
     }
 
+    @Override
     public boolean addContact(String userEmail, String contactEmail) throws IOException, ParseException {
         filename = "users.json";
         Object objc = new JSONParser().parse(new FileReader(this.filename));
@@ -409,6 +392,7 @@ public class UsersService {
         return flage;
     }
 
+    @Override
     public void deleteContact(String userEmail, String contactEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -429,6 +413,7 @@ public class UsersService {
             e.printStackTrace();
         }
     }
+    @Override
     public boolean containContact(String userEmail, String contactEmail) throws IOException, ParseException {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
@@ -445,54 +430,14 @@ public class UsersService {
     }
     // ---------------------
     // attachments manipulation
+    @Override
     public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException {
-        String senderDirectory = "accounts/" + senderEmail + "/";
-        String receiverDirectory = "accounts/" + receiverEmail + "/";
-        List<String> filenames = new ArrayList<>();
-        for(MultipartFile file : multipartFiles) {
-            String filename = StringUtils.cleanPath(file.getOriginalFilename());
-            filename = Long.toString(id) + "_" + filename;
-
-            Path fileStorage = Paths.get(senderDirectory, filename).toAbsolutePath().normalize();
-            Files.copy(file.getInputStream(), fileStorage, StandardCopyOption.REPLACE_EXISTING);
-
-            fileStorage = Paths.get(receiverDirectory, filename).toAbsolutePath().normalize();
-            Files.copy(file.getInputStream(), fileStorage, StandardCopyOption.REPLACE_EXISTING);
-            filenames.add(filename);
-        }
+        attachmentsManipulation.uploadAttachments(multipartFiles, senderEmail, receiverEmail, id);
     }
 
+    @Override
     public ResponseEntity<Resource> downloadAttachment(String userEmail, long id) throws IOException {
-        String attachmentId;
-        String attachmentsDirectory = "accounts/" + userEmail + "/";
-        File directory = new File(attachmentsDirectory);
-        String[] flist = directory.list();
-        if (flist == null) {
-            Resource  resource = null;
-            return ResponseEntity.ok().body(resource);
-        }
-        else {
-            // Linear search in the array
-            for (int i = 0; i < flist.length; i++) {
-                String filename = flist[i];
-                int index = filename.indexOf("_");
-                int lastIndex = filename.length();
-                if(filename.contains("_")){
-                    attachmentId = filename.substring(0, index);
-                    if(id == Long.parseLong(attachmentId)){
-                        Path filePath = Paths.get(attachmentsDirectory).toAbsolutePath().normalize().resolve(filename);
-                        Resource resource = new UrlResource(filePath.toUri());
-                        HttpHeaders httpHeaders = new HttpHeaders();
-                        httpHeaders.add("File-Name", filename.substring(index + 1, lastIndex));
-                        httpHeaders.add(httpHeaders.CONTENT_DISPOSITION, "attachment;File-Name=" + filename.substring(index + 1, lastIndex));
-                        return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(filePath)))
-                                .headers(httpHeaders).body(resource);
-                    }
-                }
-            }
-        }
-        Resource  resource = null;
-        return ResponseEntity.ok().body(resource);
+        return  attachmentsManipulation.downloadAttachment(userEmail, id);
     }
 
 }
