@@ -391,6 +391,24 @@ public class UsersService implements IUsersService {
         });
         return mails;
     }
+    public JSONArray sortImportance(String userEmail) throws IOException, ParseException {
+        filename = "accounts/" + userEmail + "/" + userEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        mails.sort(new Comparator() {
+            @Override
+            public int compare(Object mail1, Object mail2) {
+                JSONObject jsonMail1 = (JSONObject) mail1;
+                JSONObject jsonMail2 = (JSONObject) mail2;
+                long importance1 = (long) jsonMail1.get("importance");
+                long importance2 = (long) jsonMail2.get("importance");
+                if(importance2 > importance1) return 1;
+                else return -1;
+            }
+        });
+        return mails;
+    }
 
     @Override
     public JSONArray getcontacts(String userEmail) throws IOException, ParseException {

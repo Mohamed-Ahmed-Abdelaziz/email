@@ -8,6 +8,7 @@ public class Mail {
     private Long id;
     private boolean important;
     private boolean read;
+    private int importance;
     private String date;
 
 
@@ -19,7 +20,7 @@ public class Mail {
         this.date = date;
     }
 
-    private int importance;
+
 
     public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read, int importance) {
         this.sender = sender;

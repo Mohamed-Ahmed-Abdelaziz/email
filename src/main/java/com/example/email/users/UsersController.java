@@ -101,6 +101,10 @@ public class UsersController {
     public JSONArray sortInbox(@PathVariable String userEmail) throws IOException, ParseException {
         return usersService.sortInbox(userEmail);
     }
+    @GetMapping("sortimportance/{userEmail}")
+    public JSONArray sortImportance(@PathVariable String userEmail) throws IOException, ParseException {
+        return usersService.sortImportance(userEmail);
+    }
     @GetMapping("contacts/{userEmail}")
     public JSONArray getcontacts(@PathVariable String userEmail) throws IOException, ParseException {
         return usersService.getcontacts(userEmail);
