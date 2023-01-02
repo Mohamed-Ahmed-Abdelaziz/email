@@ -52,7 +52,7 @@ public interface IUsersService {
 
     // ---------------------
     // attachments manipulation
-    void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException;
+    void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException, ParseException;
 
     ResponseEntity<Resource> downloadAttachment(String userEmail, long id) throws IOException;
 }

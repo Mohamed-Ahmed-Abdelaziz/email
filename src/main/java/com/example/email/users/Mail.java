@@ -10,7 +10,19 @@ public class Mail {
     private boolean read;
     private int importance;
     private String date;
+    private boolean hasAttachment;
 
+    public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read, int importance, boolean hasAttachment) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.subject = subject;
+        this.body = body;
+        this.id = id;
+        this.important = important;
+        this.read = read;
+        this.importance = importance;
+        this.hasAttachment = hasAttachment;
+    }
 
     public String getDate() {
         return date;
@@ -20,19 +32,13 @@ public class Mail {
         this.date = date;
     }
 
-
-
-    public Mail(String sender, String receiver, String subject, String body, Long id, boolean important, boolean read, int importance) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.subject = subject;
-        this.body = body;
-        this.id = id;
-        this.important = important;
-        this.read = read;
-        this.importance = importance;
+    public boolean isHasAttachment() {
+        return hasAttachment;
     }
 
+    public void setHasAttachment(boolean hasAttachment) {
+        this.hasAttachment = hasAttachment;
+    }
     public int getImportance() {
         return importance;
     }
@@ -84,6 +90,7 @@ public class Mail {
                 ", \"read\": " + read +
                 ", \"importance\": " + importance +
                 ", \"date\": " +"\"" + date + "\"" +
+                ", \"hasAttachment\": " + hasAttachment +
                 '}';
     }
 }

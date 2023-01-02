@@ -81,6 +81,7 @@ public class UsersService implements IUsersService {
         LocalDateTime now = LocalDateTime.now();
         String dateNow = df.format(now);
         mail.setDate(dateNow);
+        mail.setHasAttachment(false);
         if(flag == true) {
             filename = "accounts/" + senderEmail + "/" + senderEmail + ".json";
             objc = new JSONParser().parse(new FileReader(filename));
@@ -169,7 +170,7 @@ public class UsersService implements IUsersService {
         filename = "accounts/" + userEmail + "/" + userEmail + ".json";
         Object objc = new JSONParser().parse(new FileReader(filename));
         account = (JSONObject) objc;
-        mails = (JSONArray) account.get("Trash");
+        mails = (JSONArray) account.get("trash");
         for(int i = 0; i < mails.size(); ++i){
             Object userMail = mails.get(i);
             JSONObject jsonMail = (JSONObject) userMail;
@@ -487,7 +488,7 @@ public class UsersService implements IUsersService {
     // ---------------------
     // attachments manipulation
     @Override
-    public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException {
+    public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException, ParseException {
         attachmentsManipulation.uploadAttachments(multipartFiles, senderEmail, receiverEmail, id);
     }
 

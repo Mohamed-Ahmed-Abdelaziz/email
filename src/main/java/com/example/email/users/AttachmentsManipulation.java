@@ -1,5 +1,9 @@
 package com.example.email.users;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,12 +24,55 @@ import java.util.List;
 
 public class AttachmentsManipulation {
 
-    public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException {
+    public void uploadAttachments(List<MultipartFile> multipartFiles, String senderEmail, String receiverEmail, long id) throws IOException, ParseException {
+        String filename = "accounts/" + senderEmail + "/" + senderEmail + ".json";
+        Object objc = new JSONParser().parse(new FileReader(filename));
+        JSONObject account = (JSONObject) objc;
+        JSONArray mails = (JSONArray) account.get("sent");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if ((long) jsonMail.get("id") == id){
+                jsonMail.put("hasAttachment", true);
+                mails.remove(i);
+                mails.add(jsonMail);
+                break;
+            }
+        }
+        account.put("sent", mails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //----------------------
+        filename = "accounts/" + receiverEmail + "/" + receiverEmail + ".json";
+        objc = new JSONParser().parse(new FileReader(filename));
+        account = (JSONObject) objc;
+        mails = (JSONArray) account.get("inbox");
+        for(int i = 0; i < mails.size(); ++i){
+            Object userMail = mails.get(i);
+            JSONObject jsonMail = (JSONObject) userMail;
+            if ((long) jsonMail.get("id") == id){
+                jsonMail.put("hasAttachment", true);
+                mails.remove(i);
+                mails.add(jsonMail);
+                break;
+            }
+        }
+        account.put("inbox", mails);
+        try {
+            Files.write(Paths.get(filename), account.toJSONString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //-------------------------------
         String senderDirectory = "accounts/" + senderEmail + "/";
         String receiverDirectory = "accounts/" + receiverEmail + "/";
+
         List<String> filenames = new ArrayList<>();
         for(MultipartFile file : multipartFiles) {
-            String filename = StringUtils.cleanPath(file.getOriginalFilename());
+            filename = StringUtils.cleanPath(file.getOriginalFilename());
             filename = Long.toString(id) + "_" + filename;
 
             Path fileStorage = Paths.get(senderDirectory, filename).toAbsolutePath().normalize();

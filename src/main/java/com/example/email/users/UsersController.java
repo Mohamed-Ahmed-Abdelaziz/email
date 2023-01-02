@@ -42,7 +42,7 @@ public class UsersController {
     }
     @PostMapping("sendingmail/{senderEmail}")
     public boolean sendingMail(@PathVariable String senderEmail, @RequestBody Mail mail) throws IOException, ParseException {
-        System.out.println(mail);
+//        System.out.println(mail);
         return usersService.sendingMail(senderEmail, mail);
     }
     @GetMapping("inbox/{userEmail}")
@@ -123,7 +123,7 @@ public class UsersController {
     public void uploadAttachments(@RequestParam("files")List<MultipartFile> multipartFiles
             , @PathVariable String senderEmail
             , @PathVariable String receiverEmail
-            , @PathVariable long id) throws IOException {
+            , @PathVariable long id) throws IOException, ParseException {
         usersService.uploadAttachments(multipartFiles, senderEmail, receiverEmail, id);
     }
     @GetMapping("downloadattachment/{userEmail}/{id}")
