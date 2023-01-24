@@ -257,7 +257,7 @@ public class UsersService implements IUsersService {
         for(int i = 0; i < mails.size(); ++i){
             Object userMail = mails.get(i);
             JSONObject jsonMail = (JSONObject) userMail;
-            if (jsonMail.get("id") == id){
+            if (jsonMail.get("id").equals(id)){
                 trashMails.add(mails.get(i));
                 mails.remove(i);
             }
@@ -280,7 +280,7 @@ public class UsersService implements IUsersService {
         for(int i = 0; i < mails.size(); ++i){
             Object userMail = mails.get(i);
             JSONObject jsonMail = (JSONObject) userMail;
-            if (jsonMail.get("id") == id){
+            if (jsonMail.get("id").equals(id)){
                 jsonMail.put("important", true);
                 mails.remove(i);
                 mails.add(jsonMail);
@@ -304,7 +304,7 @@ public class UsersService implements IUsersService {
         for(int i = 0; i < mails.size(); ++i){
             Object userMail = mails.get(i);
             JSONObject jsonMail = (JSONObject) userMail;
-            if (jsonMail.get("id") == id){
+            if (jsonMail.get("id").equals(id)){
                 jsonMail.put("important", false);
                 mails.remove(i);
                 mails.add(jsonMail);
@@ -328,7 +328,7 @@ public class UsersService implements IUsersService {
         for(int i = 0; i < mails.size(); ++i){
             Object userMail = mails.get(i);
             JSONObject jsonMail = (JSONObject) userMail;
-            if (jsonMail.get("id") == id){
+            if (jsonMail.get("id").equals(id)){
                 jsonMail.put("read", true);
                 mails.remove(i);
                 mails.add(jsonMail);
